@@ -1,85 +1,73 @@
+#! -*- coding:utf-8 -*-
+import change
+import serverlist
 import os
 import json
-url_jianjie = "http://alobgames.com:8080/changedescription"
-url_name = "http://alobgames.com:8080/changenickname"
-url1 = "http://alobgames.com:8080/login"
-print("更改成功以后 记得重新返回游戏查看效果")
-ch = True
+import requests
+global  login_msg
 global user
 global password
+url_login = "http://alobgames.com:8080/login"
+global quit
+quit = 0
+def printmain():
+    print("==========================")
+    print("<          黑化工具箱          >")
+    print("==========================")
+
+printmain()
 with open("user.txt","r",encoding="utf-8") as f:
 	    if os.path.getsize("user.txt")==0:
 		    user = input("请输入你的账号:")
 		    password = input("请输入你的密码:")
-		    with open("user.txt","a",encoding="utf-8") as f:
-		    	f.write(f"{user}\n{password}")
+		    with open("user.txt","w",encoding="utf-8") as f:
+		    	f.write(f"{user}"+ os.linesep + f"{password}")
 	    else:
-	        user=f.readline()
+	        user=f.readline().strip()
 	        for last_line in f:
-	         	password = last_line
-	         
-name = input("请输入你要更改的名字:")
-change = input("是否要更改简介(1.ok 2.no):")
-
-jianjie = False
-if change ==  "1":
-	jianjie = True
-headers1 = {
-"User-Agent": 'UnityPlayer/2023.2.0b1 (UnityWebRequest/1.0, libcurl/8.1.1-DEV)',
-'Accept': '*/*',
-'Accept-Encoding': 'deflate, gzip',
-'login': user,
-'password':password,
-'platform': 'Android',
-'ver': '26',
-'data_ver': '1',
-'X-Unity-Version': '2023.2.0b1'
-}
-res1 = requests.get(url1,headers=headers1)
+	         	password = last_line.strip()
+print("帐号:"+user)
+print("密码:"+password)
+""" 进.行登录操作 """
+res1 = requests.get(url_login,headers=change.getlogin_ua(user,password))
 
 aa = res1.text
 msg = json.loads(aa)
-secret = msg["secret"]
-id = msg['id']
-headers = {
-"User-Agent": 'UnityPlayer/2023.2.0b1 (UnityWebRequest/1.0, libcurl/8.1.1-DEV)',
-'Accept': '*/*',
-'Accept-Encoding': 'deflate, gzip',
-'id': str(id),
-"secret":secret,
-'newnickname': name,
-'platform': 'Android',
-'ver': '26',
-'data_ver': '1',
-'X-Unity-Version': '2023.2.0b1'
-}
-res = requests.get(url_name,headers=headers)
-aaa = res.text
-msg1 = json.loads(aaa)
-if jianjie:
-	des = input("请输入你要更改的简介")
-	headers2 = {
-	"User-Agent": 'UnityPlayer/2023.2.0b1 (UnityWebRequest/1.0, libcurl/8.1.1-DEV)',
-	'Accept': '*/*',
-	'Accept-Encoding': 'deflate, gzip',
-	'id': str(id),
-	"secret":secret,
-	'description': des,
-	'platform': 'Android',
-	'ver': '26',
-	'data_ver': '1',
-	'X-Unity-Version': '2023.2.0b1'
-	}
-	res2 = requests.get(url_jianjie,headers=headers2)
-	aa = res2.text
-	msg2 = json.loads(aa)
-	if msg2["code"] == "cs_0":
-		print("简介更改成功")
-	else:
-		print("简介更改失败")
-	
-	
-if msg1["code"] == "cs_0":
-	print("改名成功")
+""" 获取登录密钥 """
+if "secret"  in aa:
+	secret = msg["secret"]
+	id = msg['id']
+	login_msg = "已登录"
 else:
-	print("改名失败")
+	login_msg = "登录失败"
+
+if __name__ == "__main__":
+    print(f"当前状态:{login_msg}\n")
+    while quit != 1:
+        if login_msg == "已登录":
+             print(
+             "==== 选项 ====\n",
+             "1.  更改名称    \n",
+             "2.  更改简介    \n",
+             "3.  服务器列表  \n",
+             "4.     退出      \n"
+             )
+             num = int(input("输入数字选择:"))
+             if num == 1:
+                name = input("请输入你要更改的名字:")
+                change.changename(id=id,secret=secret,name=name)
+             elif num == 2:
+                des = input("请输入你要更改的简介:")
+                change.changedes(id=id,secret=secret,des=des)
+             elif num == 3:
+             	serverlist.getlist()
+             elif num == 4:
+                quit = 1
+             elif num < 4 or num == 0:
+                print("错误 请重新选择")
+        else:
+            with open("user.txt","w",encoding="utf-8") as f:
+             if os.path.getsize("user.txt")==0:
+                user = input("请输入你的账号:")
+                password = input("请输入你的密码:")
+                f.write(f"{user}\n{password}")
