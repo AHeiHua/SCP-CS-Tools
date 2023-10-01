@@ -1,7 +1,7 @@
 import  os
 import json
 import requests
-
+from urllib.parse import quote
 
 url_jianjie = "http://alobgames.com:8080/changedescription"
 url_name = "http://alobgames.com:8080/changenickname"
@@ -30,13 +30,14 @@ def getlogin_ua(name,password):
 
 """ 更改简介和名字的UA """
 def getname_ua(id,secret,name):
+    name1 = quote(name)
     headers = {
     "User-Agent": 'UnityPlayer/2023.2.0b1 (UnityWebRequest/1.0, libcurl/8.1.1-DEV)',
     'Accept': '*/*',
     'Accept-Encoding': 'deflate, gzip',
     'id': str(id),
     "secret":secret,
-    'newnickname': name,
+    'newnickname': name1,
     'platform': 'Android',
     'ver': '26',
     'data_ver': '1',
@@ -45,13 +46,14 @@ def getname_ua(id,secret,name):
     return headers
 """更改简介的UA"""
 def getdes_ua(id,secret,des):
+    des1 = quote(des)
     headers = {
         "User-Agent": 'UnityPlayer/2023.2.0b1 (UnityWebRequest/1.0, libcurl/8.1.1-DEV)',
         'Accept': '*/*',
         'Accept-Encoding': 'deflate, gzip',
         'id': str(id),
         "secret":secret,
-        'description': des,
+        'description': des1,
         'platform': 'Android',
         'ver': '26',
         'data_ver': '1',

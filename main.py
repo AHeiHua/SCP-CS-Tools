@@ -5,6 +5,7 @@ import os
 import json
 import getservers
 import datetime
+from urllib.parse import quote
 import requests
 global  login_msg
 global user
@@ -12,18 +13,20 @@ global password
 url_login = "http://alobgames.com:8080/login"
 global quit
 quit = 0
-with open("/storage/emulated/0/黑化工具箱/user.txt","a") as f:
-    pass
-with open("/storage/emulated/0/黑化工具箱/time.txt","a") as f:
-    pass
+if not os.path.exists(r"user.txt"):
+    with open("user.txt","a+") as f:
+        pass
+if not os.path.exists(r"time.txt"):
+    with open("time.txt","a+") as f:
+        pass
 def printmain():
     print("==========================")
     print("<          黑化工具箱          >")
     print("==========================")
 time = datetime.datetime.now().ctime()
 printmain()
-with open("/storage/emulated/0/黑化工具箱/user.txt","r",encoding="utf-8") as f:
-	    if os.path.getsize("user.txt")==0:
+with open("user.txt","r",encoding="utf-8") as f:
+	    if not os.path.exists("user.txt"):
 		    user = input("请输入你的账号:")
 		    password = input("请输入你的密码:")
 		    with open("user.txt","w",encoding="utf-8") as f:
@@ -48,7 +51,11 @@ if "secret"  in aa:
 		last_time = f.read()
 else:
 	login_msg = "登录失败"
-
+def is_chinese(text):
+    for char in text:
+        if '\u4e00' <= char <= '\u9fa5':
+            return True
+    return False
 if __name__ == "__main__":
     print(f"当前状态:{login_msg}\n")
     print("上次登录时间:"+time)
@@ -71,6 +78,7 @@ if __name__ == "__main__":
              num = int(input("输入数字选择:"))
              if num == 1:
                 name = input("请输入你要更改的名字:")
+                print(quote(name))
                 change.changename(id=id,secret=secret,name=name)
              elif num == 2:
                 des = input("请输入你要更改的简介:")
